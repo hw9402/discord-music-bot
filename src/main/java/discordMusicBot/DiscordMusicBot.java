@@ -4,11 +4,11 @@ import discordMusicBot.commands.Music;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,13 +29,15 @@ public class DiscordMusicBot {
         String token = properties.getProperty("discord.api.key");
 
         JDA jda = JDABuilder.createLight(token, Collections.emptyList())
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+                .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_VOICE_STATES)
+                .setMemberCachePolicy(MemberCachePolicy.VOICE)
+                .enableCache(CacheFlag.VOICE_STATE)
                 .addEventListeners(new Music())
                 .build();
 
         jda.updateCommands().addCommands(
-                Commands.slash("ping", "reply pong"),
-                Commands.slash("집게사장", "그래 이 새끼야")
+                Commands.slash("play", "재생하고 싶은 노래 제목과 아티스트명을 입력해주세요!")
+                        .addOption(OptionType.STRING, "title", "제목 + 아티스트 or 유튜브 링크")
         ).queue();
 
         jda.getPresence().setStatus(OnlineStatus.ONLINE);
