@@ -1,6 +1,6 @@
 package discordMusicBot;
 
-import discordMusicBot.commands.Music;
+import discordMusicBot.commands.Play;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -32,7 +32,7 @@ public class DiscordMusicBot {
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_VOICE_STATES)
                 .setMemberCachePolicy(MemberCachePolicy.VOICE)
                 .enableCache(CacheFlag.VOICE_STATE)
-                .addEventListeners(new Music())
+                .addEventListeners(new Play())
                 .build();
 
         jda.updateCommands().addCommands(
