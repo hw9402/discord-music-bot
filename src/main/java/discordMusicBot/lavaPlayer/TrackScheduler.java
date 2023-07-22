@@ -12,6 +12,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     private final AudioPlayer player;
     private BlockingQueue<AudioTrack> queue = new LinkedBlockingQueue<>();
+    private boolean isRepeat = false;
 
     public TrackScheduler(AudioPlayer player) {
         this.player = player;
@@ -19,12 +20,32 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        player.startTrack(queue.poll(), false);
+        if(isRepeat) {
+            player.startTrack(track.makeClone(), false);
+        } else {
+            player.startTrack(queue.poll(), false);
+        }
     }
 
-    public void queue(AudioTrack track) {
+    public void queue(AudioTrack track) throws InterruptedException {
         if (!player.startTrack(track, true)) {
-            queue.offer(track);
+            queue.put(track);
         }
+    }
+
+    public AudioPlayer getPlayer() {
+        return player;
+    }
+
+    public BlockingQueue<AudioTrack> getQueue() {
+        return queue;
+    }
+
+    public boolean isRepeat() {
+        return isRepeat;
+    }
+
+    public void setRepeat(boolean repeat) {
+        isRepeat = repeat;
     }
 }
