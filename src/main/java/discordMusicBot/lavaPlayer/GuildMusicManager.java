@@ -5,21 +5,21 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 
 public class GuildMusicManager {
 
-    private TrackScheduler trackScheduler;
-    private AudioForwarder audioForwarder;
+    private final TrackScheduler trackScheduler;
+    private final AudioPlayerSendHandler audioPlayerSendHandler;
 
     public GuildMusicManager(AudioPlayerManager manager) {
         AudioPlayer player = manager.createPlayer();
         trackScheduler = new TrackScheduler(player);
         player.addListener(trackScheduler);
-        audioForwarder = new AudioForwarder(player);
+        audioPlayerSendHandler = new AudioPlayerSendHandler(player);
     }
 
     public TrackScheduler getTrackScheduler() {
         return trackScheduler;
     }
 
-    public AudioForwarder getAudioForwarder() {
-        return audioForwarder;
+    public AudioPlayerSendHandler getAudioForwarder() {
+        return audioPlayerSendHandler;
     }
 }
