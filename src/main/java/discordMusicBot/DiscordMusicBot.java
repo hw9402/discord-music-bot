@@ -1,6 +1,8 @@
 package discordMusicBot;
 
 import discordMusicBot.commands.Play;
+import discordMusicBot.commands.Skip;
+import discordMusicBot.commands.Stop;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -33,11 +35,15 @@ public class DiscordMusicBot {
                 .setMemberCachePolicy(MemberCachePolicy.VOICE)
                 .enableCache(CacheFlag.VOICE_STATE)
                 .addEventListeners(new Play())
+                .addEventListeners(new Skip())
+                .addEventListeners(new Stop())
                 .build();
 
         jda.updateCommands().addCommands(
                 Commands.slash("play", "재생하고 싶은 노래 제목과 아티스트명을 입력해주세요!")
-                        .addOption(OptionType.STRING, "title", "제목 + 아티스트 or 유튜브 링크")
+                        .addOption(OptionType.STRING, "title", "제목 + 아티스트 or 유튜브 링크"),
+                Commands.slash("skip", "다음 노래를 재생하고 싶다면 사용하세요!"),
+                Commands.slash("stop", "노래를 멈추고 봇을 내보내고 싶다면 사용하세요!")
         ).queue();
 
         jda.getPresence().setStatus(OnlineStatus.ONLINE);
