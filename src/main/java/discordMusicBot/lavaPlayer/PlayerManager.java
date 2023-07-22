@@ -1,5 +1,12 @@
 package discordMusicBot.lavaPlayer;
 
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.model.SearchListResponse;
+import com.google.api.services.youtube.model.SearchResult;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -9,21 +16,47 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.Guild;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class PlayerManager {
 
     private static PlayerManager INSTANCE;
-    private final Map<Long, GuildMusicManager> guildMusicManagers = new HashMap<>();
-    private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
+    private final Map<Long, GuildMusicManager> guildMusicManagers;
+    private final AudioPlayerManager audioPlayerManager;
+    private final YouTube youtube;
 
-    private PlayerManager() {
-        AudioSourceManagers.registerRemoteSources(audioPlayerManager);
-        AudioSourceManagers.registerLocalSource(audioPlayerManager);
+    private String getGoogleApiKey() {
+        Properties properties = new Properties();
+
+        try (InputStream inputStream = new FileInputStream("config.properties")) {
+            properties.load(inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return properties.getProperty("google.api.key");
     }
 
-    public static PlayerManager get() {
+    private PlayerManager() throws GeneralSecurityException, IOException {
+        this.guildMusicManagers = new HashMap<>();
+        this.audioPlayerManager = new DefaultAudioPlayerManager();
+        AudioSourceManagers.registerRemoteSources(audioPlayerManager);
+        AudioSourceManagers.registerLocalSource(audioPlayerManager);
+        NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+        youtube = new YouTube.Builder(httpTransport, jsonFactory, request -> {})
+                .setApplicationName("DiscordMusicBot")
+                .build();
+    }
+
+    public static PlayerManager get() throws GeneralSecurityException, IOException {
         if (INSTANCE == null) {
             INSTANCE = new PlayerManager();
         }
@@ -38,21 +71,43 @@ public class PlayerManager {
         });
     }
 
-    public void play(Guild guild, String trackURL) {
+    private List<SearchResult> searchYoutube(String query) {
+        try {
+            YouTube.Search.List search = youtube.search().list("id");
+            search.setKey(getGoogleApiKey());
+            search.setQ(query);
+            search.setType("video");
+            search.setMaxResults(5L);
+            SearchListResponse response = search.execute();
+            return response.getItems();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void playTitle(Guild guild, String query) {
+        List<SearchResult> searchResults = searchYoutube(query);
+
+        if (!searchResults.isEmpty()) {
+            String videoId = searchResults.get(0).getId().getVideoId();
+            String videoUrl = "https://www.youtube.com/watch?v=" + videoId;
+            playURL(guild, videoUrl);
+        }
+    }
+
+    public void playURL(Guild guild, String trackURL) {
         GuildMusicManager guildMusicManager = getGuildMusicManager(guild);
         audioPlayerManager.loadItemOrdered(guildMusicManager, trackURL, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-                try {
-                    guildMusicManager.getTrackScheduler().queue(track);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                guildMusicManager.getTrackScheduler().queue(track);
             }
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
-
+                for (AudioTrack track : playlist.getTracks()) {
+                    guildMusicManager.getTrackScheduler().queue(track);
+                }
             }
 
             @Override

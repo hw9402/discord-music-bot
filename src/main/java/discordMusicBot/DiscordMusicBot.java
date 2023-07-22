@@ -40,8 +40,9 @@ public class DiscordMusicBot {
                 .build();
 
         jda.updateCommands().addCommands(
-                Commands.slash("play", "재생하고 싶은 노래 제목과 아티스트명을 입력해주세요!")
-                        .addOption(OptionType.STRING, "title", "제목 + 아티스트 or 유튜브 링크"),
+                Commands.slash("play", "재생하고 싶은 노래 제목과 아티스트명 또는 유튜브 링크를 입력해주세요! 두 개의 옵션을 입력하면, 제목 기준으로 불러옵니다. ")
+                        .addOption(OptionType.STRING, "title", "제목 + 아티스트명")
+                        .addOption(OptionType.STRING, "link", "유튜브 링크 (재생목록 등등 안 됩니다. only 유튜브 영상)"),
                 Commands.slash("skip", "다음 노래를 재생하고 싶다면 사용하세요!"),
                 Commands.slash("stop", "노래를 멈추고 봇을 내보내고 싶다면 사용하세요!")
         ).queue();

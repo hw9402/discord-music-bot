@@ -27,9 +27,9 @@ public class TrackScheduler extends AudioEventAdapter {
         }
     }
 
-    public void queue(AudioTrack track) throws InterruptedException {
+    public void queue(AudioTrack track) {
         if (!player.startTrack(track, true)) {
-            queue.put(track);
+            queue.offer(track);
         }
     }
 

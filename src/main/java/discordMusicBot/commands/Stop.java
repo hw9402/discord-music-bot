@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +44,12 @@ public class Stop extends ListenerAdapter {
                 return;
             }
 
-            GuildMusicManager guildMusicManager = PlayerManager.get().getGuildMusicManager(event.getGuild());
+            GuildMusicManager guildMusicManager;
+            try {
+                guildMusicManager = PlayerManager.get().getGuildMusicManager(event.getGuild());
+            } catch (GeneralSecurityException | IOException e) {
+                throw new RuntimeException(e);
+            }
             TrackScheduler trackScheduler = guildMusicManager.getTrackScheduler();
             trackScheduler.getQueue().clear();
             trackScheduler.getPlayer().stopTrack();

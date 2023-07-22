@@ -7,6 +7,9 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 public class Skip extends ListenerAdapter {
 
     @Override
@@ -33,7 +36,14 @@ public class Skip extends ListenerAdapter {
                 return;
             }
 
-            GuildMusicManager guildMusicManager = PlayerManager.get().getGuildMusicManager(event.getGuild());
+            GuildMusicManager guildMusicManager;
+
+            try {
+                guildMusicManager = PlayerManager.get().getGuildMusicManager(event.getGuild());
+            } catch (GeneralSecurityException | IOException e) {
+                throw new RuntimeException(e);
+            }
+
             guildMusicManager.getTrackScheduler().getPlayer().stopTrack();
             event.reply("다음 노래가 재생됩니다.").queue();
         }

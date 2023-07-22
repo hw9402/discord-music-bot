@@ -6,6 +6,9 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 public class Play extends ListenerAdapter {
 
     @Override
@@ -31,9 +34,27 @@ public class Play extends ListenerAdapter {
                 }
             }
 
-            PlayerManager playerManager = PlayerManager.get();
-            playerManager.play(event.getGuild(), event.getOption("title").getAsString());
-            event.reply("노래가 재생됩니다.").queue();
+            String title = event.getOption("title") != null ? event.getOption("title").getAsString() : "";
+            String link = event.getOption("link") != null ? event.getOption("link").getAsString() : "";
+            PlayerManager playerManager;
+
+            if (!title.equals("")) {
+                try {
+                    playerManager = PlayerManager.get();
+                } catch (GeneralSecurityException | IOException e) {
+                    throw new RuntimeException(e);
+                }
+                playerManager.playTitle(event.getGuild(), title);
+                event.reply("노래가 재생됩니다.\n" + "제목 : " + title).queue();
+            } else if (!link.equals("")) {
+                try {
+                    playerManager = PlayerManager.get();
+                } catch (GeneralSecurityException | IOException e) {
+                    throw new RuntimeException(e);
+                }
+                playerManager.playURL(event.getGuild(), link);
+                event.reply("노래가 재생됩니다.\n" + link).queue();
+            }
         }
     }
 }
