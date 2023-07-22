@@ -33,6 +33,7 @@ public class Play extends ListenerAdapter {
 
             PlayerManager playerManager = PlayerManager.get();
             playerManager.play(event.getGuild(), event.getOption("title").getAsString());
+            event.reply("노래가 재생됩니다.").queue();
         }
     }
 }
