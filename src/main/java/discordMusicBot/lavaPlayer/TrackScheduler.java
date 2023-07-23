@@ -11,7 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TrackScheduler extends AudioEventAdapter {
 
     private final AudioPlayer player;
-    private BlockingQueue<AudioTrack> queue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<AudioTrack> queue = new LinkedBlockingQueue<>();
     private boolean isRepeat = false;
 
     public TrackScheduler(AudioPlayer player) {
@@ -39,13 +39,5 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public BlockingQueue<AudioTrack> getQueue() {
         return queue;
-    }
-
-    public boolean isRepeat() {
-        return isRepeat;
-    }
-
-    public void setRepeat(boolean repeat) {
-        isRepeat = repeat;
     }
 }

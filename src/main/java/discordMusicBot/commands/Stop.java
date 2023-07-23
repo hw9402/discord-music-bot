@@ -5,20 +5,13 @@ import discordMusicBot.lavaPlayer.PlayerManager;
 import discordMusicBot.lavaPlayer.TrackScheduler;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Stop extends ListenerAdapter {
-
-    private static final Long IDLE_TIME = 5 * 60 * 1000L; // 5분
-    private final Map<String, Long> userLastActiveTime = new HashMap<>();
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
