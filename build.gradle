@@ -1,11 +1,51 @@
+//plugins {
+//    id 'java'
+//}
+//
+//group = 'org.example'
+//version = '1.0-SNAPSHOT'
+//
+//repositories {
+//    mavenCentral()
+//    maven {
+//        url 'https://m2.dv8tion.net/releases'
+//    }
+//}
+//
+//dependencies {
+//    implementation 'net.dv8tion:JDA:5.0.0-beta.12'
+//    implementation 'com.sedmelluq:lavaplayer:1.3.77'
+//    implementation 'com.google.apis:google-api-services-youtube:v3-rev206-1.25.0'
+//    testImplementation platform('org.junit:junit-bom:5.9.1')
+//    testImplementation 'org.junit.jupiter:junit-jupiter'
+//}
+//
+//test {
+//    useJUnitPlatform()
+//}
+//
+//jar {
+//    manifest {
+//        attributes 'Main-Class': 'discordMusicBot.DiscordMusicBot'
+//    }
+//}
+
 plugins {
     id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
-group = 'org.example'
+application.mainClass = 'discordMusicBot.DiscordMusicBot'   //TODO change here
+group = 'discordMusicBot'                            //TODO change here
 version = '1.0-SNAPSHOT'
 
+shadowJar {
+    archiveFileName = 'discordMusicBot.jar'       //TODO change here
+}
+
 repositories {
+    mavenLocal()
     mavenCentral()
     maven {
         url 'https://m2.dv8tion.net/releases'
@@ -13,6 +53,10 @@ repositories {
 }
 
 dependencies {
+    //Logging implementation, you can remove the comments if you have a warning related to loggers
+    //implementation 'ch.qos.logback:logback-classic:1.2.11'
+
+    //JDA
     implementation 'net.dv8tion:JDA:5.0.0-beta.12'
     implementation 'com.sedmelluq:lavaplayer:1.3.77'
     implementation 'com.google.apis:google-api-services-youtube:v3-rev206-1.25.0'
@@ -20,6 +64,10 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
-test {
-    useJUnitPlatform()
+compileJava {
+    options.encoding = 'UTF-8'
+    options.incremental = true
+
+    //JDA supports Java 8 and above
+    sourceCompatibility = "1.8"
 }

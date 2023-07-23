@@ -14,6 +14,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import discordMusicBot.DiscordMusicBot;
 import net.dv8tion.jda.api.entities.Guild;
 
 import java.io.FileInputStream;
@@ -34,11 +35,10 @@ public class PlayerManager {
 
     private String getGoogleApiKey() {
         Properties properties = new Properties();
-
-        try (InputStream inputStream = new FileInputStream("config.properties")) {
+        try (InputStream inputStream = DiscordMusicBot.class.getClassLoader().getResourceAsStream("config.properties")) {
             properties.load(inputStream);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         return properties.getProperty("google.api.key");

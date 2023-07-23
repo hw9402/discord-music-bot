@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -23,10 +22,10 @@ public class DiscordMusicBot {
 
     public static void main(String[] args) {
         Properties properties = new Properties();
-        try (InputStream inputStream = new FileInputStream("config.properties")) {
+        try (InputStream inputStream = DiscordMusicBot.class.getClassLoader().getResourceAsStream("config.properties")) {
             properties.load(inputStream);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         String token = properties.getProperty("discord.api.key");
